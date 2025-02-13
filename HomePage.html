@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instant Photo Capture</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    video {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    canvas {
+      display: none;
+    }
+    button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .image {
+      margin: 10px;
+    }
+    img {
+      max-width: 100px;
+      max-height: 100px;
+      border-radius: 8px;
+    }
+    #userMenu {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f4f4f4;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    #addFriendForm {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="userMenu">
+    <span id="userEmail">Not logged in</span>
+    <button id="loginButton">Login with Gmail</button>
+  </div>
+
+  <h1>Instant Photo Capture</h1>
+
+  <!-- Video Preview -->
+  <video id="video" autoplay></video>
+  <br>
+  <button id="captureButton">📸 Take Photo</button>
+
+  <canvas id="canvas"></canvas>
+  <div id="images"></div>
+
+  <div id="addFriendForm" style="display: none;">
+    <h3>Add a Friend</h3>
+    <input type="email" id="friendEmail" placeholder="Friend's email" required>
+    <button id="addFriendButton">Add Friend</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+    import { getFirestore, doc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // 🔹 Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCUKI__XDO2uZuiodEDnwXiGLBQPlH8NG8",
+      authDomain: "unknownanswers-8fb4e.firebaseapp.com",
+      projectId: "unknownanswers-8fb4e",
+      storageBucket: "unknownanswers-8fb4e.appspot.com",
+      messagingSenderId: "220349774424",
+      appId: "1:220349774424:web:cc2b6a8a25e61767d0682d"
+    };
+
+    // 🔹 Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+    const db = getFirestore(app);
+
+    // 🔹 Get Elements
+    const video = document.getElementById("video");
+    const captureButton = document.getElementById("captureButton");
+    const canvas = document.getElementById("canvas");
+    const imagesDiv = document.getElementById("images");
+    const userEmailDisplay = document.getElementById("userEmail");
+    const loginButton = document.getElementById("loginButton");
+    const addFriendForm = document.getElementById("addFriendForm");
+    const addFriendButton = document.getElementById("addFriendButton");
+    const friendEmailInput = document.getElementById("friendEmail");
+
+    // 🔹 Start Camera
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        alert("Camera access denied. Please allow camera permissions.");
+      }
+    }
+    startCamera();
+
+    // 🔹 Capture Photo
+    captureButton.addEventListener("click", async () => {
+      const context = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(async (blob) => {
+        const fileName = `photo_${Date.now()}.jpg`;
+        const fileRef = ref(storage, 'images/' + fileName);
+
+        try {
+          await uploadBytes(fileRef, blob);
+          const downloadURL = await getDownloadURL(fileRef);
+          displayImage(downloadURL);
+        } catch (error) {
+          console.error("Upload error:", error);
+          alert("Failed to upload image.");
+        }
+      }, "image/jpeg");
+    });
+
+    // 🔹 Display the Image
+    function displayImage(url) {
+      const imgElement = document.createElement("img");
+      imgElement.src = url;
+      const divElement = document.createElement("div");
+      divElement.classList.add("image");
+      divElement.appendChild(imgElement);
+      imagesDiv.appendChild(divElement);
+    }
+
+    // 🔹 Authentication: Google Login
+    const provider = new GoogleAuthProvider();
+
+    loginButton.addEventListener("click", async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        userEmailDisplay.textContent = `Logged in as: ${user.email}`;
+        loginButton.style.display = "none";
+        addFriendForm.style.display = "block"; // Show add friend form
+      } catch (error) {
+        console.error("Login error:", error);
+        alert("Failed to log in.");
+      }
+    });
+
+    // 🔹 Monitor Authentication State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        userEmailDisplay.textContent = `Logged in as: ${user.email}`;
+        loginButton.style.display = "none";
+        addFriendForm.style.display = "block"; // Show add friend form
+      } else {
+        userEmailDisplay.textContent = "Not logged in";
+        loginButton.style.display = "block";
+        addFriendForm.style.display = "none"; // Hide add friend form
+      }
+    });
+
+    // 🔹 Sign Out
+    function signOutUser() {
+      signOut(auth).then(() => {
+        console.log("User signed out");
+      }).catch((error) => {
+        console.error("Sign out error:", error);
+      });
+    }
+
+    // 🔹 Add Friend
+    addFriendButton.addEventListener("click", async () => {
+      const friendEmail = friendEmailInput.value.trim();
+
+      if (friendEmail) {
+        try {
+          const user = auth.currentUser;
+          if (user) {
+            // Save the friend email in Firestore (you could adjust this as needed)
+            await addDoc(collection(db, "friends"), {
+              userEmail: user.email,
+              friendEmail: friendEmail
+            });
+            alert(`Friend ${friendEmail} added successfully!`);
+          }
+        } catch (error) {
+          console.error("Add friend error:", error);
+          alert("Failed to add friend.");
+        }
+      } else {
+        alert("Please enter a friend's email.");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+      <div class="form-group">
+        <label for="newEmail">Email:</label>
+        <input type="email" id="newEmail" name="newEmail" required>
+      </div>
+      <div class="form-group">
+        <label for="newPassword">Password:</label>
+        <input type="password" id="newPassword" name="newPassword" required>
+      </div>
+      <div class="form-group">
+        <button type="submit">Sign Up</button>
+      </div>
+    </form>
+
+    <div class="link">
+      <a href="index.html">Already have an account? Log in</a>
+    </div>
+  </div>
+
+  <!-- Firebase SDK (modular imports) -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCUKI__XDO2uZuiodEDnwXiGLBQPlH8NG8",
+      authDomain: "unknownanswers-8fb4e.firebaseapp.com",
+      projectId: "unknownanswers-8fb4e",
+      storageBucket: "unknownanswers-8fb4e.appspot.com",
+      messagingSenderId: "220349774424",
+      appId: "1:220349774424:web:cc2b6a8a25e61767d0682d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Sign-up functionality using Firebase
+    document.getElementById('signupForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('newEmail').value;
+      const password = document.getElementById('newPassword').value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Successful sign-up
+          const user = userCredential.user;
+          window.location.href = 'index.html'; // Redirect to login page after sign up
+        })
+        .catch((error) => {
+          alert("Error: " + error.message); // Handle error
+        });
+    });
+  </script>
+
+</body>
+</html>

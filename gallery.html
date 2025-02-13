@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .image-container {
+      position: relative;
+      margin: 10px;
+      display: inline-block;
+    }
+    .gallery img {
+      max-width: 400px;
+      max-height: 400px;
+      border-radius: 8px;
+    }
+    .frame {
+        position: absolute;
+        top: 0%;
+        bottom: 0%;
+        left: 0%;
+        right: 0%;
+        border-left: 80px solid rgba(0, 0, 0, 1);
+        border-right: 80px solid rgba(0, 0, 0, 1);
+        border-top: 40px solid rgba(0, 0, 0, 1);
+        border-bottom: 40px solid rgba(0, 0, 0, 1);
+        pointer-events: none; /* Allow interaction with the video */
+    }
+    .menu {
+      display: flex;
+      justify-content: space-around;
+      background-color: #4CAF50;
+      padding: 10px;
+      font-size: 18px;
+    }
+    .menu a {
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+    }
+    .menu a:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Menu Bar -->
+  <div class="menu">
+    <a href="index.html">Home</a>
+    <a href="#">Gallery</a>
+  </div>
+
+  <h1>Gallery</h1>
+
+  <div class="gallery" id="gallery"></div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getStorage, ref, listAll, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCUKI__XDO2uZuiodEDnwXiGLBQPlH8NG8",
+      authDomain: "unknownanswers-8fb4e.firebaseapp.com",
+      projectId: "unknownanswers-8fb4e",
+      storageBucket: "unknownanswers-8fb4e.appspot.com",
+      messagingSenderId: "220349774424",
+      appId: "1:220349774424:web:cc2b6a8a25e61767d0682d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const storage = getStorage(app);
+
+    // Fetch Images from Firebase Storage
+    async function fetchImages() {
+      const storageRef = ref(storage, 'images/');
+      try {
+        const result = await listAll(storageRef);
+        result.items.forEach((imageRef) => {
+          getDownloadURL(imageRef).then((url) => {
+            const imageContainer = document.createElement("div");
+            imageContainer.classList.add("image-container");
+
+            // Add frame
+            const frame = document.createElement("div");
+            frame.classList.add("frame");
+
+            // Add image
+            const imgElement = document.createElement("img");
+            imgElement.src = url;
+
+            // Append frame and image to the container
+            imageContainer.appendChild(frame);
+            imageContainer.appendChild(imgElement);
+
+            // Add the container to the gallery
+            document.getElementById("gallery").appendChild(imageContainer);
+          });
+        });
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    }
+
+    fetchImages();
+  </script>
+
+</body>
+</html>
