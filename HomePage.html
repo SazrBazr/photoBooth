@@ -82,24 +82,27 @@
         border-bottom: 5rem solid rgba(0, 0, 0, 1);
         pointer-events: none; /* Allow interaction with the video */
     }
+    .button-container{
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <!-- Menu Bar -->
   <div class="menu">
     <a href="#">Home</a>
-    <a href="#" id="galleryLink">Gallery</a>
+    <a href="gallery.html" id="galleryLink">Gallery</a>
   </div>
 
   <h1>Instant Photo Capture</h1>
-  <div>
-    <!-- Video Preview with Frame -->
-    <div class="video-container">
-      <video id="video" autoplay playsinline muted></video>
-      <div class="frame"></div> <!-- This is the frame covering 20% of the video -->
-    </div>
+  <!-- Video Preview with Frame -->
+  <div class="video-container">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="frame"></div> <!-- This is the frame covering 20% of the video -->
+  </div>
 
-    <br>
+      <!-- Button Container -->
+  <div class="button-container">
     <button id="startCameraButton">📹 Start Camera</button>
     <button id="captureButton" disabled>📸 Take Photo</button>
   </div>
