@@ -31,11 +31,6 @@
       display: inline-block;
       margin-top: 10px;
     }
-    video {
-      border-radius: 8px;
-      width: 100%;
-      max-width: 480px;
-    }
     .frame {
       position: absolute;
       top: 0%;
@@ -62,10 +57,18 @@
       display: inline-block;
       margin: 10px;
     }
+    video {
+      border-radius: 8px;
+      width: 100%;
+      max-width: 480px;
+      transform: scaleX(-1); /* Mirror the video */
+    }
+
     .image-container img {
       max-width: 30rem;
       max-height: 30rem;
       border-radius: 8px;
+      transform: scaleX(-1); /* Mirror the captured photo */
     }
     .image-container .frame {
         position: absolute;
