@@ -82,9 +82,6 @@
         border-bottom: 5rem solid rgba(0, 0, 0, 1);
         pointer-events: none; /* Allow interaction with the video */
     }
-    .button-container{
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
@@ -93,6 +90,11 @@
     <a href="#">Home</a>
     <a href="gallery.html" id="galleryLink">Gallery</a>
   </div>
+    <!-- Button Container -->
+    <div class="button-container">
+      <button id="startCameraButton">📹 Start Camera</button>
+      <button id="captureButton" disabled>📸 Take Photo</button>
+    </div>
 
   <h1>Instant Photo Capture</h1>
   <!-- Video Preview with Frame -->
@@ -101,11 +103,7 @@
     <div class="frame"></div> <!-- This is the frame covering 20% of the video -->
   </div>
 
-      <!-- Button Container -->
-  <div class="button-container">
-    <button id="startCameraButton">📹 Start Camera</button>
-    <button id="captureButton" disabled>📸 Take Photo</button>
-  </div>
+
 
   <canvas id="canvas"></canvas>
   <div id="images"></div>
