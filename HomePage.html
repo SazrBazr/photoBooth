@@ -12,8 +12,8 @@
     /* Menu Styling */
     .menu {
       display: flex;
-      justify-content: space-around;
-      background-color: #4CAF50;
+      gap: 10px;
+      background-color:hotpink;
       padding: 10px;
       font-size: 18px;
     }
@@ -24,7 +24,7 @@
       border-radius: 5px;
     }
     .menu a:hover {
-      background-color: #45a049;
+      background-color: rgb(239, 72, 156);
     }
     .video-container {
       position: relative;
@@ -59,11 +59,22 @@
     }
     video {
       border-radius: 8px;
-      width: 100%;
-      max-width: 480px;
       transform: scaleX(-1); /* Mirror the video */
     }
-
+    .capture{
+      position: absolute;
+      bottom: 2rem; /* Adjust this value to position it properly */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white; /* Optional: Better visibility */
+      padding: 20px 30px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      z-index: 10; /* Ensure it appears above the video */
+      pointer-events: auto; /* Ensure it remains clickable */
+    }
     .image-container img {
       max-width: 30rem;
       max-height: 30rem;
@@ -93,17 +104,14 @@
     <!-- Button Container -->
     <div class="button-container">
       <button id="startCameraButton">📹 Start Camera</button>
-      <button id="captureButton" disabled>📸 Take Photo</button>
     </div>
 
-  <h1>Instant Photo Capture</h1>
   <!-- Video Preview with Frame -->
   <div class="video-container">
     <video id="video" autoplay playsinline muted></video>
     <div class="frame"></div> <!-- This is the frame covering 20% of the video -->
+    <button class="capture" id="captureButton" disabled>📸 Take Photo</button>
   </div>
-
-
 
   <canvas id="canvas"></canvas>
   <div id="images"></div>
