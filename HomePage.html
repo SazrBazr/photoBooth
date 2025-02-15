@@ -378,7 +378,6 @@
       const fileRef = ref(storage, filePath);
       try {
         await uploadBytes(fileRef, capturedBlob);
-        alert("Image saved successfully!");
         capturedBlob = null; // Clear blob after saving
       } catch (error) {
         alert("Failed to upload image.");
@@ -393,7 +392,6 @@
       const fileRef = ref(storage, filePath);
       try {
         await uploadBytes(fileRef, capturedBlob);
-        alert("Image discarded successfully!");
         capturedBlob = null; // Clear blob after discarding
       } catch (error) {
         alert("Failed to discard image.");
