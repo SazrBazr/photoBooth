@@ -44,28 +44,27 @@
     .image-container {
       position: relative;
       display: inline-block;
-      max-width: 100%;
-      width: 280px;
+      width: fit-content;
+      height: fit-content;
       margin-bottom: 20px;
+      visibility: hidden; /* Hide image and frame initially */
     }
     .gallery img {
-      width: 100%;
-      height: auto;
-      max-width: 320px;
+      object-fit: contain; /* Ensure the image fits within the container */
+      max-width: 250px;
+      max-height: 460px;
       border-radius: 8px;
       transform: scaleX(-1); /* Mirror the captured photo */
     }
     .frame {
       position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      border-left: 0.5rem solid rgba(0, 0, 0, 1);
-      border-right: 0.5rem solid rgba(0, 0, 0, 1);
-      border-top: 2.5rem solid rgba(0, 0, 0, 1);
-      border-bottom: 2.5rem solid rgba(0, 0, 0, 1);
       pointer-events: none;
+      border-style: solid;
+      border-color: black;
+      top: 0%;
+      bottom: 0%;
+      left: 0%;
+      right: 0%;
     }
 
     /* Responsive Design */
@@ -129,15 +128,43 @@
             const imageContainer = document.createElement("div");
             imageContainer.classList.add("image-container");
 
-            // Add frame
-            const frame = document.createElement("div");
-            frame.classList.add("frame");
-
             // Add image
             const imgElement = document.createElement("img");
             imgElement.src = url;
 
-            // Append frame and image to the container
+            // Add frame
+            const frame = document.createElement("div");
+            frame.classList.add("frame");
+
+            // Create a function to handle both image and frame being ready
+            function displayImageAndFrame() {
+              imageContainer.style.visibility = 'visible'; // Show the image and frame when both are ready
+            }
+
+            // Wait for the image to load
+            imgElement.onload = function () {
+              // Check the orientation of the image
+              const isVertical = imgElement.naturalHeight > imgElement.naturalWidth;
+
+              if (isVertical) {
+                // Adjust frame for vertical image
+                frame.style.borderTop = `${imgElement.height * 0.20}px solid rgba(0, 0, 0, 1)`; // 20% from the top
+                frame.style.borderBottom = `${imgElement.height * 0.20}px solid rgba(0, 0, 0, 1)`; // 20% from the bottom
+                frame.style.borderLeft = `${imgElement.width * 0.075}px solid rgba(0, 0, 0, 1)`; // 5% from the left
+                frame.style.borderRight = `${imgElement.width * 0.075}px solid rgba(0, 0, 0, 1)`; // 5% from the right
+              } else {
+                // Adjust frame for horizontal image
+                frame.style.borderTop = `${imgElement.height * 0.075}px solid rgba(0, 0, 0, 1)`; // 20% from the top
+                frame.style.borderBottom = `${imgElement.height * 0.075}px solid rgba(0, 0, 0, 1)`; // 20% from the bottom
+                frame.style.borderLeft = `${imgElement.width * 0.20}px solid rgba(0, 0, 0, 1)`; // 5% from the left
+                frame.style.borderRight = `${imgElement.width * 0.20}px solid rgba(0, 0, 0, 1)`; // 5% from the right
+              }
+
+              // Once the image has loaded and frame is set, show them
+              displayImageAndFrame();
+            };
+
+            // Append image and frame to the container
             imageContainer.appendChild(imgElement);
             imageContainer.appendChild(frame);
 
