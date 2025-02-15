@@ -88,7 +88,6 @@
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      background-color: white;
       padding: 18px 30px;
       font-size: 18px;
       border-radius: 10px;
@@ -199,7 +198,6 @@
   </div>
 
   <canvas id="canvas"></canvas>
-  <div id="images"></div>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -277,7 +275,7 @@
         try {
           await uploadBytes(fileRef, blob);
           const downloadURL = await getDownloadURL(fileRef);
-          displayImage(downloadURL);
+          //displayImage(downloadURL);
         } catch (error) {
           console.error("Upload error:", error);
           alert("Failed to upload image.");
@@ -285,24 +283,24 @@
       }, "image/jpeg");
     });
 
-    // Display the Image with Frame
-    function displayImage(url) {
-      const imageContainer = document.createElement("div");
-      imageContainer.classList.add("image-container");
+    // // Display the Image with Frame
+    // function displayImage(url) {
+    //   const imageContainer = document.createElement("div");
+    //   imageContainer.classList.add("image-container");
 
-      const frame = document.createElement("div");
-      frame.classList.add("frame");
+    //   const frame = document.createElement("div");
+    //   frame.classList.add("frame");
 
-      const imgElement = document.createElement("img");
-      imgElement.src = url;
+    //   const imgElement = document.createElement("img");
+    //   imgElement.src = url;
 
-      // Append frame and image to the container
-      imageContainer.appendChild(imgElement);
-      imageContainer.appendChild(frame);
+    //   // Append frame and image to the container
+    //   imageContainer.appendChild(imgElement);
+    //   imageContainer.appendChild(frame);
 
-      // Append the container to the images div
-      imagesDiv.appendChild(imageContainer);
-    }
+    //   // Append the container to the images div
+    //   imagesDiv.appendChild(imageContainer);
+    // }
 
     // PIN Code Protection for Gallery
     galleryLink.addEventListener("click", function (event) {
