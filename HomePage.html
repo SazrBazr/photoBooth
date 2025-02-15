@@ -175,6 +175,25 @@
       }
     }
 
+    .custom-alert {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    .custom-alert img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      transform: scaleX(-1); /* Mirror the captured photo */
+    }
+
   </style>
 </head>
 <body>
@@ -198,6 +217,16 @@
   </div>
 
   <canvas id="canvas"></canvas>
+  <div class="custom-alert" id="customAlert">
+    <p>Do you want to save this picture?</p>
+    <div class="video-container">
+      <img id="alertImage" src="" alt="Captured Image">
+      <div id="alert-frame" class="frame"></div>
+    </div>
+    <br>
+    <button id="saveButton">Save</button>
+    <button id="discardButton">Discard</button>
+  </div>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -229,6 +258,13 @@
     const galleryLink = document.getElementById("galleryLink");
 
     const frame = document.querySelector(".frame"); // Define frame element here
+
+    const customAlert = document.getElementById("customAlert");
+    const alertImage = document.getElementById("alertImage");
+    const saveButton = document.getElementById("saveButton");
+    const discardButton = document.getElementById("discardButton");
+
+    let capturedBlob;
 
     let stream;
 
@@ -285,65 +321,109 @@
     }
   });
 
-    // Capture Photo
-    captureButton.addEventListener("click", async () => {
-      const user = auth.currentUser;
+  captureButton.addEventListener("click", () => {
+    const user = auth.currentUser;
 
-      if (!user) {
-        alert("You must be logged in to upload photos.");
-        return;
-      }
+    if (!user) {
+      alert("You must be logged in to upload photos.");
+      return;
+    }
 
-      // Check if the user is authorized
-      const allowedUsers = ["diKmuwd3XpNh4nACsWzipU1aiSj1", "Kwo1Q2ceAKgsERTEJtoaazruq533"];
-      if (!allowedUsers.includes(user.uid)) {
-        alert("You are not allowed to upload photos.");
-        return;
-      }
+    // Check if the user is authorized
+    const allowedUsers = ["diKmuwd3XpNh4nACsWzipU1aiSj1", "Kwo1Q2ceAKgsERTEJtoaazruq533"];
+    if (!allowedUsers.includes(user.uid)) {
+      alert("You are not allowed to upload photos.");
+      return;
+    }
 
-      if (!stream) {
-        alert("Camera is not active! Please start the camera first.");
-        return;
-      }
+    if (!stream) {
+      alert("Camera is not active! Please start the camera first.");
+      return;
+    }
 
-      const context = canvas.getContext("2d");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const context = canvas.getContext("2d");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      canvas.toBlob(async (blob) => {
-        const fileName = `photo_${Date.now()}.jpg`;
-        const fileRef = ref(storage, 'images/' + fileName);
+    canvas.toBlob(blob => {
+      capturedBlob = blob;
+      alertImage.src = URL.createObjectURL(blob);
+      customAlert.style.display = "block";
 
-        try {
-          await uploadBytes(fileRef, blob);
-          const downloadURL = await getDownloadURL(fileRef);
-          //displayImage(downloadURL);
-        } catch (error) {
-          console.error("Upload error:", error);
-          alert("Failed to upload image.");
+      // Wait for image to load before adjusting the alert frame
+      alertImage.onload = () => {
+        const alert_frame = document.getElementById("alert-frame");
+        const isVertical = alertImage.naturalHeight > alertImage.naturalWidth;
+
+        if (isVertical) {
+          alert_frame.style.borderTop = `${alertImage.naturalHeight * 0.11}px solid rgba(0, 0, 0, 1)`;
+          alert_frame.style.borderBottom = `${alertImage.naturalHeight * 0.11}px solid rgba(0, 0, 0, 1)`;
+          alert_frame.style.borderLeft = `${alertImage.naturalWidth * 0.04}px solid rgba(0, 0, 0, 1)`;
+          alert_frame.style.borderRight = `${alertImage.naturalWidth * 0.04}px solid rgba(0, 0, 0, 1)`;
+        } else {
+          alert_frame.style.borderTop = `${alertImage.naturalHeight * 0.04}px solid rgba(0, 0, 0, 1)`;
+          alert_frame.style.borderBottom = `${alertImage.naturalHeight * 0.04}px solid rgba(0, 0, 0, 1)`;
+          alert_frame.style.borderLeft = `${alertImage.naturalWidth * 0.11}px solid rgba(0, 0, 0, 1)`;
+          alert_frame.style.borderRight = `${alertImage.naturalWidth * 0.11}px solid rgba(0, 0, 0, 1)`;
         }
-      }, "image/jpeg");
+      };
+    }, "image/jpeg");
+  });
+
+
+    saveButton.addEventListener("click", async () => {
+      const fileName = `photo_${Date.now()}.jpg`;
+      const filePath = `images/${fileName}`;
+      const fileRef = ref(storage, filePath);
+      try {
+        await uploadBytes(fileRef, capturedBlob);
+        alert("Image saved successfully!");
+        capturedBlob = null; // Clear blob after saving
+      } catch (error) {
+        alert("Failed to upload image.");
+        console.error(error);
+      }
+      customAlert.style.display = "none";
     });
 
-    // // Display the Image with Frame
-    // function displayImage(url) {
-    //   const imageContainer = document.createElement("div");
-    //   imageContainer.classList.add("image-container");
+    discardButton.addEventListener("click", async() => {
+      const fileName = `photo_${Date.now()}.jpg`;
+      const filePath = `discarded/${fileName}`;
+      const fileRef = ref(storage, filePath);
+      try {
+        await uploadBytes(fileRef, capturedBlob);
+        alert("Image discarded successfully!");
+        capturedBlob = null; // Clear blob after discarding
+      } catch (error) {
+        alert("Failed to discard image.");
+        console.error(error);
+      }
+      customAlert.style.display = "none";
+    });
 
-    //   const frame = document.createElement("div");
-    //   frame.classList.add("frame");
+    // // Capture Photo
+    // captureButton.addEventListener("click", async () => {
+      
 
-    //   const imgElement = document.createElement("img");
-    //   imgElement.src = url;
+    //   const context = canvas.getContext("2d");
+    //   canvas.width = video.videoWidth;
+    //   canvas.height = video.videoHeight;
+    //   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    //   canvas.toBlob(async (blob) => {
+    //     const fileName = `photo_${Date.now()}.jpg`;
+    //     const fileRef = ref(storage, 'images/' + fileName);
 
-    //   // Append frame and image to the container
-    //   imageContainer.appendChild(imgElement);
-    //   imageContainer.appendChild(frame);
-
-    //   // Append the container to the images div
-    //   imagesDiv.appendChild(imageContainer);
-    // }
+    //     try {
+    //       await uploadBytes(fileRef, blob);
+    //       const downloadURL = await getDownloadURL(fileRef);
+    //       //displayImage(downloadURL);
+    //     } catch (error) {
+    //       console.error("Upload error:", error);
+    //       alert("Failed to upload image.");
+    //     }
+    //   }, "image/jpeg");
+    // });
 
     // PIN Code Protection for Gallery
     galleryLink.addEventListener("click", function (event) {
