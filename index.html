@@ -7,27 +7,41 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f8f9fa;
     }
     .container {
+      width: 90%;
       max-width: 400px;
-      margin: 0 auto;
       padding: 20px;
-      border: 1px solid #ccc;
+      background: white;
       border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
     .form-group {
       margin-bottom: 15px;
+      text-align: left;
+    }
+    .form-group label {
+      font-size: 14px;
+      font-weight: bold;
     }
     .form-group input {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
+      width: 90%;
+      padding: 12px;
+      margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 5px;
+      font-size: 16px;
     }
     button {
-      padding: 10px 20px;
+      width: 97%;
+      padding: 12px;
       border: none;
       background-color: #4CAF50;
       color: white;
@@ -38,45 +52,43 @@
     button:hover {
       background-color: #45a049;
     }
-    .link {
-      display: block;
-      text-align: center;
-      margin-top: 10px;
+    .form-group input[type="checkbox"] {
+      width: auto;
+    }
+    .remember-me {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+    .remember-me input {
+      margin-right: 8px;
     }
   </style>
 </head>
 <body>
-
   <div class="container">
     <h2>Login</h2>
     <form id="loginForm">
       <div class="form-group">
-        <label for="username">Email:</label>
-        <input type="email" id="email" name="email" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="example@email.com" required>
       </div>
       <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" placeholder="password" required>
       </div>
-      <div class="form-group">
-        <label>
-          <input type="checkbox" id="rememberMe"> Remember Me
-        </label>
+      <div class="form-group remember-me">
+        <input type="checkbox" id="rememberMe">
+        <label for="rememberMe">Remember Me</label>
       </div>
       <button type="submit">Login</button>
     </form>
-
-    <div class="link">
-      <a href="signup.html">Don't have an account? Sign up</a>
-    </div>
   </div>
-
+  
   <script type="module">
-    // Import the necessary Firebase modules
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.17.2/firebase-auth.js';
 
-    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCUKI__XDO2uZuiodEDnwXiGLBQPlH8NG8",
       authDomain: "unknownanswers-8fb4e.firebaseapp.com",
@@ -86,31 +98,25 @@
       appId: "1:220349774424:web:cc2b6a8a25e61767d0682d"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Login functionality using Firebase
     document.getElementById('loginForm').addEventListener('submit', function(event) {
       event.preventDefault();
-      
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Successful login
-          const user = userCredential.user;
           if (document.getElementById('rememberMe').checked) {
-            localStorage.setItem('rememberMe', true); // Store preference
+            localStorage.setItem('rememberMe', true);
           }
-          window.location.href = 'HomePage.html'; // Redirect to dashboard
+          window.location.href = 'HomePage.html';
         })
         .catch((error) => {
-          alert("Error: " + error.message); // Handle error
+          alert("Error: " + error.message);
         });
     });
   </script>
-
 </body>
 </html>

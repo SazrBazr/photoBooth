@@ -8,29 +8,68 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
     }
+
     /* Menu Styling */
     .menu {
       display: flex;
-      gap: 10px;
-      background-color:hotpink;
-      padding: 10px;
+      justify-content: center;
+      gap: 15px;
+      background-color: hotpink;
+      padding: 12px;
       font-size: 18px;
+      flex-wrap: wrap;
     }
+
     .menu a {
       color: white;
       text-decoration: none;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 5px;
     }
+
     .menu a:hover {
       background-color: rgb(239, 72, 156);
     }
+
+    /* Button Container */
+    .button-container {
+      margin: 15px;
+    }
+
+    button {
+      margin: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      background-color: hotpink;
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background-color: rgb(239, 72, 156);
+    }
+
+    /* Video Container */
     .video-container {
       position: relative;
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 20px;
+      max-width: 90%;
     }
+
+    video {
+      width: 100%;
+      max-width: 1280px;
+      border-radius: 8px;
+      transform: scaleX(-1); /* Mirror the video */
+    }
+
     .frame {
       position: absolute;
       top: 0%;
@@ -43,73 +82,119 @@
       border-bottom: 10rem solid rgba(0, 0, 0, 1);
       pointer-events: none; /* Allow interaction with the video */
     }
-    canvas {
-      display: none;
-    }
-    button {
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .image-container {
-      position: relative;
-      display: inline-block;
-      margin: 10px;
-    }
-    video {
-      border-radius: 8px;
-      transform: scaleX(-1); /* Mirror the video */
-    }
-    .capture{
+
+    .capture {
       position: absolute;
-      bottom: 2rem; /* Adjust this value to position it properly */
+      bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      background-color: white; /* Optional: Better visibility */
-      padding: 20px 30px;
+      background-color: white;
+      padding: 18px 30px;
       font-size: 18px;
       border-radius: 10px;
       border: none;
       cursor: pointer;
-      z-index: 10; /* Ensure it appears above the video */
-      pointer-events: auto; /* Ensure it remains clickable */
+      z-index: 10;
+      pointer-events: auto;
     }
+
+    /* Image Container */
+    .image-container {
+      position: relative;
+      display: inline-block;
+      margin: 15px;
+    }
+
     .image-container img {
-      max-width: 30rem;
+      max-width: 100%;
       max-height: 30rem;
       border-radius: 8px;
       transform: scaleX(-1); /* Mirror the captured photo */
     }
+
     .image-container .frame {
-        position: absolute;
-        top: 0%;
-        bottom: 0%;
-        left: 0%;
-        right: 0%;
-        border-left: 1rem solid rgba(0, 0, 0, 1);
-        border-right: 1rem solid rgba(0, 0, 0, 1);
-        border-top: 5rem solid rgba(0, 0, 0, 1);
-        border-bottom: 5rem solid rgba(0, 0, 0, 1);
-        pointer-events: none; /* Allow interaction with the video */
+      position: absolute;
+      top: 0%;
+      bottom: 0%;
+      left: 0%;
+      right: 0%;
+      border-left: 1rem solid rgba(0, 0, 0, 1);
+      border-right: 1rem solid rgba(0, 0, 0, 1);
+      border-top: 5rem solid rgba(0, 0, 0, 1);
+      border-bottom: 5rem solid rgba(0, 0, 0, 1);
+      pointer-events: none;
     }
+
+    canvas {
+      display: none;
+    }
+
+    /* Responsive Design for smaller screens */
+    @media (max-width: 768px) {
+      .menu {
+        font-size: 16px;
+      }
+
+      button {
+        font-size: 14px;
+      }
+
+      .capture {
+        font-size: 16px;
+        padding: 15px 25px;
+      }
+
+      .video-container {
+        margin-top: 20px;
+      }
+
+      .image-container {
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .menu {
+        font-size: 14px;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .video-container {
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+
+      .capture {
+        padding: 12px 20px;
+      }
+    }
+
   </style>
 </head>
 <body>
+
   <!-- Menu Bar -->
   <div class="menu">
     <a href="#">Home</a>
     <a href="gallery.html" id="galleryLink">Gallery</a>
   </div>
-    <!-- Button Container -->
-    <div class="button-container">
-      <button id="startCameraButton">📹 Start Camera</button>
-    </div>
+
+  <!-- Button Container -->
+  <div class="button-container">
+    <button id="startCameraButton">📹 Start Camera</button>
+  </div>
 
   <!-- Video Preview with Frame -->
   <div class="video-container">
     <video id="video" autoplay playsinline muted></video>
-    <div class="frame"></div> <!-- This is the frame covering 20% of the video -->
+    <div class="frame"></div>
     <button class="capture" id="captureButton" disabled>📸 Take Photo</button>
   </div>
 
@@ -118,6 +203,7 @@
 
   <!-- Firebase SDK -->
   <script type="module">
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
 
@@ -133,6 +219,7 @@
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
     const storage = getStorage(app);
 
     // Get Elements
@@ -159,6 +246,20 @@
 
     // Capture Photo
     captureButton.addEventListener("click", async () => {
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert("You must be logged in to upload photos.");
+        return;
+      }
+
+      // Check if the user is authorized
+      const allowedUsers = ["diKmuwd3XpNh4nACsWzipU1aiSj1", "Kwo1Q2ceAKgsERTEJtoaazruq533"];
+      if (!allowedUsers.includes(user.uid)) {
+        alert("You are not allowed to upload photos.");
+        return;
+      }
+
       if (!stream) {
         alert("Camera is not active! Please start the camera first.");
         return;
@@ -217,5 +318,6 @@
       }
     });
   </script>
+
 </body>
 </html>
