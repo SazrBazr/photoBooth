@@ -88,11 +88,6 @@
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      padding: 18px 30px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
       z-index: 10;
       pointer-events: auto;
     }
@@ -175,25 +170,6 @@
       }
     }
 
-    .custom-alert {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      text-align: center;
-    }
-    .custom-alert img {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 8px;
-      transform: scaleX(-1); /* Mirror the captured photo */
-    }
-
   </style>
 </head>
 <body>
@@ -213,20 +189,14 @@
   <div class="video-container">
     <video id="video" autoplay playsinline muted></video>
     <div id="video-frame" class="frame"></div>
-    <button class="capture" id="captureButton" disabled>📸 Take Photo</button>
+    <div class="capture">
+      <button id="captureButton" disabled>📸 Take Photo</button>
+      <button id="saveButton" style="display: none;">Save</button>
+      <button id="discardButton" style="display: none;">Discard</button>
+    </div>
   </div>
 
   <canvas id="canvas"></canvas>
-  <div class="custom-alert" id="customAlert">
-    <p>Do you want to save this picture?</p>
-    <div class="video-container">
-      <img id="alertImage" src="" alt="Captured Image">
-      <div id="alert-frame" class="frame"></div>
-    </div>
-    <br>
-    <button id="saveButton">Save</button>
-    <button id="discardButton">Discard</button>
-  </div>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -259,8 +229,6 @@
 
     const frame = document.querySelector(".frame"); // Define frame element here
 
-    const customAlert = document.getElementById("customAlert");
-    const alertImage = document.getElementById("alertImage");
     const saveButton = document.getElementById("saveButton");
     const discardButton = document.getElementById("discardButton");
 
@@ -314,7 +282,7 @@
       captureButton.disabled = false; // Enable capture button
 
       // Update frame dimensions as soon as the camera is started
-      video.addEventListener("loadedmetadata", updateFrameDimensions());
+      video.addEventListener("loadedmetadata", () => updateFrameDimensions());
     } catch (error) {
       console.error("Error accessing camera:", error);
       alert("Camera access denied. Please allow camera permissions.");
@@ -340,6 +308,9 @@
       alert("Camera is not active! Please start the camera first.");
       return;
     }
+    captureButton.style.display = "none";
+    saveButton.style.display = "inline-block";
+    discardButton.style.display = "inline-block";
 
     const context = canvas.getContext("2d");
     canvas.width = video.videoWidth;
@@ -348,26 +319,7 @@
 
     canvas.toBlob(blob => {
       capturedBlob = blob;
-      alertImage.src = URL.createObjectURL(blob);
-      customAlert.style.display = "block";
-
-      // Wait for image to load before adjusting the alert frame
-      alertImage.onload = () => {
-        const alert_frame = document.getElementById("alert-frame");
-        const isVertical = alertImage.naturalHeight > alertImage.naturalWidth;
-
-        if (isVertical) {
-          alert_frame.style.borderTop = `${alertImage.naturalHeight * 0.11}px solid rgba(0, 0, 0, 1)`;
-          alert_frame.style.borderBottom = `${alertImage.naturalHeight * 0.11}px solid rgba(0, 0, 0, 1)`;
-          alert_frame.style.borderLeft = `${alertImage.naturalWidth * 0.04}px solid rgba(0, 0, 0, 1)`;
-          alert_frame.style.borderRight = `${alertImage.naturalWidth * 0.04}px solid rgba(0, 0, 0, 1)`;
-        } else {
-          alert_frame.style.borderTop = `${alertImage.naturalHeight * 0.04}px solid rgba(0, 0, 0, 1)`;
-          alert_frame.style.borderBottom = `${alertImage.naturalHeight * 0.04}px solid rgba(0, 0, 0, 1)`;
-          alert_frame.style.borderLeft = `${alertImage.naturalWidth * 0.11}px solid rgba(0, 0, 0, 1)`;
-          alert_frame.style.borderRight = `${alertImage.naturalWidth * 0.11}px solid rgba(0, 0, 0, 1)`;
-        }
-      };
+      video.pause();
     }, "image/jpeg");
   });
 
@@ -383,6 +335,13 @@
         alert("Failed to upload image.");
         console.error(error);
       }
+      video.play();
+      captureButton.style.display = "inline-block";
+      saveButton.style.display = "none";
+      discardButton.style.display = "none";
+
+      // Update frame dimensions as soon as the camera is started
+      video.addEventListener("loadedmetadata", () => updateFrameDimensions());
       customAlert.style.display = "none";
     });
 
@@ -397,6 +356,13 @@
         alert("Failed to discard image.");
         console.error(error);
       }
+      video.play();
+      captureButton.style.display = "inline-block";
+      saveButton.style.display = "none";
+      discardButton.style.display = "none";
+
+      // Update frame dimensions as soon as the camera is started
+      video.addEventListener("loadedmetadata", () => updateFrameDimensions());
       customAlert.style.display = "none";
     });
 
