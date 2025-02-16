@@ -148,12 +148,13 @@
 
               if (isVertical) {
                 // Adjust frame for vertical image
-                frame.style.borderTop = `${imgElement.height * 0.30}px solid rgba(0, 0, 0, 1)`; // 30% from the top
-                frame.style.borderBottom = `${imgElement.height * 0.30}px solid rgba(0, 0, 0, 1)`; // 30% from the bottom
+                frame.style.borderTop = `${imgElement.height * 0.40}px solid rgba(0, 0, 0, 1)`; // 40% from the top
+                frame.style.borderBottom = `${imgElement.height * 0.40}px solid rgba(0, 0, 0, 1)`; // 40% from the bottom
               } else {
                 // Adjust frame for horizontal image
-                frame.style.borderLeft = `${imgElement.width * 0.30}px solid rgba(0, 0, 0, 1)`; // 3% from the left
-                frame.style.borderRight = `${imgElement.width * 0.30}px solid rgba(0, 0, 0, 1)`; // 3% from the right
+                frame.style.borderLeft = `${imgElement.width * 0.40}px solid rgba(0, 0, 0, 1)`; // 40% from the left
+                frame.style.borderRight = `${imgElement.width * 0.40}px solid rgba(0, 0, 0, 1)`; // 40% from the right
+                frame.style.width = `${imgElement.width}px`;
               }
 
               // Once the image has loaded and frame is set, show them
